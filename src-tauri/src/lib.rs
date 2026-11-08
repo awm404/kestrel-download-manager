@@ -8,7 +8,8 @@ use std::sync::Arc;
 use ureq::ResponseExt;
 
 use tauri::{
-    menu::{Menu, MenuItem, PredefinedMenuItem},
+    image::Image,
+    menu::{ContextMenu, IconMenuItem, Menu, PredefinedMenuItem},
     tray::{MouseButton, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, WindowEvent,
 };
@@ -1115,6 +1116,130 @@ fn show_main_window(app: &AppHandle) {
     });
 }
 
+/// 16×16 tray-menu glyph. Windows only paints `hbmpItem` when the menu
+/// style includes `MNS_CHECKORBMP`, which muda does not set.
+fn tray_glyph(draw: impl Fn(&mut TrayGlyph)) -> Image<'static> {
+    let mut glyph = TrayGlyph::new();
+    draw(&mut glyph);
+    glyph.into_image()
+}
+
+struct TrayGlyph {
+    buf: Vec<u8>,
+}
+
+impl TrayGlyph {
+    fn new() -> Self {
+        Self {
+            buf: vec![0; 16 * 16 * 4],
+        }
+    }
+
+    fn px(&mut self, x: i32, y: i32, color: [u8; 3]) {
+        if (0..16).contains(&x) && (0..16).contains(&y) {
+            let i = ((y * 16 + x) * 4) as usize;
+            self.buf[i] = color[0];
+            self.buf[i + 1] = color[1];
+            self.buf[i + 2] = color[2];
+            self.buf[i + 3] = 255;
+        }
+    }
+
+    fn rect(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: [u8; 3]) {
+        for y in y0..=y1 {
+            for x in x0..=x1 {
+                self.px(x, y, color);
+            }
+        }
+    }
+
+    fn frame(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: [u8; 3]) {
+        for x in x0..=x1 {
+            self.px(x, y0, color);
+            self.px(x, y1, color);
+        }
+        for y in y0..=y1 {
+            self.px(x0, y, color);
+            self.px(x1, y, color);
+        }
+    }
+
+    fn into_image(self) -> Image<'static> {
+        Image::new_owned(self.buf, 16, 16)
+    }
+}
+
+fn tray_icon_open() -> Image<'static> {
+    const C: [u8; 3] = [56, 189, 248];
+    tray_glyph(|g| {
+        g.frame(2, 3, 13, 12, C);
+        g.rect(2, 3, 13, 5, C);
+        g.rect(4, 7, 7, 8, C);
+        g.rect(4, 10, 10, 10, C);
+    })
+}
+
+fn tray_icon_folder() -> Image<'static> {
+    const C: [u8; 3] = [251, 191, 36];
+    tray_glyph(|g| {
+        g.rect(2, 4, 7, 6, C);
+        g.frame(2, 6, 13, 12, C);
+        g.rect(3, 7, 12, 7, C);
+    })
+}
+
+fn tray_icon_pause() -> Image<'static> {
+    const C: [u8; 3] = [251, 191, 36];
+    tray_glyph(|g| {
+        g.rect(4, 3, 6, 12, C);
+        g.rect(9, 3, 11, 12, C);
+    })
+}
+
+fn tray_icon_resume() -> Image<'static> {
+    const C: [u8; 3] = [52, 211, 153];
+    tray_glyph(|g| {
+        for row in 0..10 {
+            let inset = row.min(9 - row);
+            g.rect(4, 3 + row, 4 + 2 + inset, 3 + row, C);
+        }
+    })
+}
+
+fn tray_icon_quit() -> Image<'static> {
+    const C: [u8; 3] = [248, 113, 113];
+    tray_glyph(|g| {
+        for i in 3..13 {
+            g.px(i, i, C);
+            g.px(i, 15 - i, C);
+            g.px(i + 1, i, C);
+            g.px(i + 1, 15 - i, C);
+        }
+    })
+}
+
+#[cfg(windows)]
+fn enable_tray_menu_icons<R: tauri::Runtime>(menu: &Menu<R>) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        GetMenuInfo, SetMenuInfo, MENUINFO, MIM_STYLE, MNS_CHECKORBMP,
+    };
+    let Ok(handle) = menu.hpopupmenu() else {
+        return;
+    };
+    unsafe {
+        let mut info: MENUINFO = std::mem::zeroed();
+        info.cbSize = std::mem::size_of::<MENUINFO>() as u32;
+        info.fMask = MIM_STYLE;
+        if GetMenuInfo(handle as _, &mut info) == 0 {
+            info.dwStyle = 0;
+        }
+        info.cbSize = std::mem::size_of::<MENUINFO>() as u32;
+        info.fMask = MIM_STYLE;
+        info.dwStyle |= MNS_CHECKORBMP;
+        let _ = SetMenuInfo(handle as _, &info);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     log_app("run() called");
@@ -1141,14 +1266,51 @@ pub fn run() {
             log_app(&format!("setup: initial webview_windows count = {}", windows.len()));
             show_main_window(app.handle());
 
-            let show_i = MenuItem::with_id(app, "show", "&Open Kestrel Download Manager", true, None::<&str>)?;
-            let folder_i = MenuItem::with_id(app, "open_folder", "Open &Downloads Folder", true, None::<&str>)?;
+            let show_i = IconMenuItem::with_id(
+                app,
+                "show",
+                "&Open Kestrel Download Manager",
+                true,
+                Some(tray_icon_open()),
+                None::<&str>,
+            )?;
+            let folder_i = IconMenuItem::with_id(
+                app,
+                "open_folder",
+                "Open &Downloads Folder",
+                true,
+                Some(tray_icon_folder()),
+                None::<&str>,
+            )?;
             let sep1 = PredefinedMenuItem::separator(app)?;
-            let pause_i = MenuItem::with_id(app, "pause_all", "&Pause All Transfers", true, None::<&str>)?;
-            let resume_i = MenuItem::with_id(app, "resume_all", "&Resume All Transfers", true, None::<&str>)?;
+            let pause_i = IconMenuItem::with_id(
+                app,
+                "pause_all",
+                "&Pause All Transfers",
+                true,
+                Some(tray_icon_pause()),
+                None::<&str>,
+            )?;
+            let resume_i = IconMenuItem::with_id(
+                app,
+                "resume_all",
+                "&Resume All Transfers",
+                true,
+                Some(tray_icon_resume()),
+                None::<&str>,
+            )?;
             let sep2 = PredefinedMenuItem::separator(app)?;
-            let quit_i = MenuItem::with_id(app, "quit", "&Quit Kestrel", true, None::<&str>)?;
+            let quit_i = IconMenuItem::with_id(
+                app,
+                "quit",
+                "&Quit Kestrel",
+                true,
+                Some(tray_icon_quit()),
+                None::<&str>,
+            )?;
             let menu = Menu::with_items(app, &[&show_i, &folder_i, &sep1, &pause_i, &resume_i, &sep2, &quit_i])?;
+            #[cfg(windows)]
+            enable_tray_menu_icons(&menu);
 
             if let Some(window) = app.get_webview_window("main") {
                 let icon_bytes = include_bytes!("../icons/128x128.png");

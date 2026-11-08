@@ -20,6 +20,11 @@ First public release of Kestrel Download Manager for Windows.
 - Browser companion extension for Chromium. It reads the RPC secret from Kestrel automatically while the app is running.
 - **Folder** opens the directory that contains the download. A torrent is labelled Seeding only while it is actively seeding, and Stop Seed reports a failure if the engine rejects the pause.
 
+### Fixed
+
+- The tray menu shows an icon beside each command.
+- Kestrel Engine's version banner links to this repository.
+
 ### Accessibility
 
 - Targets WCAG 2.2 AA. See [ACCESSIBILITY.md](ACCESSIBILITY.md).
