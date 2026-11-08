@@ -14,8 +14,9 @@
 
 Kestrel wraps aria2's fast multi-connection, BitTorrent and magnet engine in a small native window built with Tauri. It is designed to work equally well with a mouse, a keyboard alone, or a screen reader, and targets [WCAG 2.2 level AA](ACCESSIBILITY.md).
 
-<!-- Replace with a real screenshot before publishing, e.g. docs/screenshot.png -->
-> **Screenshot:** _add `docs/screenshot.png` and reference it here._
+<p align="center">
+  <img src="docs/screenshot-advanced.png" alt="Kestrel in Advanced mode: bandwidth chart, piece map, and a completed transfer" width="840">
+</p>
 
 ## Contents
 
@@ -51,9 +52,9 @@ Kestrel wraps aria2's fast multi-connection, BitTorrent and magnet engine in a s
 | --- | --- |
 | Windows 10 or 11 | The supported platform today. Some features (toasts, Explorer integration, clipboard) use Windows APIs; macOS and Linux builds are untested. |
 | [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) | Preinstalled on Windows 11 and current Windows 10. |
-| A download engine | The portable build includes [Kestrel Engine](engine/README.md), a lightly modified aria2. Otherwise install [aria2](https://aria2.github.io/) 1.35 or newer. Kestrel starts the engine for you if it is not already running. |
+| A download engine | The installer and the portable build both include [Kestrel Engine](engine/README.md), a lightly modified aria2. A build from source without that binary needs [aria2](https://aria2.github.io/) 1.35 or newer. Kestrel starts the engine for you if it is not already running. |
 
-If you're not using the portable build, install aria2 with WinGet:
+If you are running from source and `kestrel-engine.exe` is not beside the app, install aria2 with WinGet:
 
 ```powershell
 winget install aria2.aria2
@@ -69,9 +70,15 @@ Kestrel looks for an engine in this order:
 
 ## Installation
 
-Download the latest installer from the [Releases page](https://github.com/awm404/kestrel-download-manager/releases), run it, and launch **Kestrel Download Manager** from the Start menu.
+Both builds are on the [Releases page](https://github.com/awm404/kestrel-download-manager/releases). Each one includes Kestrel Engine, so you do not install aria2 separately.
 
-On first launch a short feature tour opens. Use <kbd>→</kbd> and <kbd>←</kbd> to move through it, or <kbd>Esc</kbd> to skip it. You can reopen it at any time with the **Feature tour** button.
+**Installer.** Download `Kestrel-Download-Manager-1.0.0-x64-setup.exe` and run it. It installs for the current user, with no administrator prompt, into `%LOCALAPPDATA%\Kestrel Download Manager`, and adds a Start menu shortcut. The welcome page uses Kestrel's own artwork. WebView2 is downloaded during setup if Windows does not already have it. The engine, the licence notices and the browser extension are installed next to the app.
+
+**Portable.** Download `Kestrel-Download-Manager-1.0.0-portable-x64.zip`, unzip it, and run `Kestrel Download Manager.exe`. Nothing is added to the Start menu. You can keep the folder on a USB drive.
+
+Settings for either build are stored in `%USERPROFILE%\.aria2`, not in the install folder.
+
+On first launch a short feature tour opens. Use <kbd>→</kbd> and <kbd>←</kbd> to move through it, or <kbd>Esc</kbd> to skip it. You can reopen it at any time with the **Feature tour** button. Switch to **Advanced** in the toolbar for the bandwidth chart and piece map shown above.
 
 ## Building from source
 
@@ -89,11 +96,15 @@ npm install
 # Run in development mode with hot reload of the front end
 npm run dev
 
-# Produce an optimised build and installers in src-tauri/target/release/bundle
+# Produce the app and the Windows installer
 npm run build
 ```
 
 The front end is a single dependency-free file, `src/index.html`, so no bundler step is needed.
+
+`npm run build` writes `src-tauri/target/release/bundle/nsis/Kestrel Download Manager_1.0.0_x64-setup.exe`. The installer is branded with `src-tauri/nsis/header.bmp` and `sidebar.bmp`, and it copies `kestrel-engine.exe` plus the licence notices to the install folder. Build [Kestrel Engine](engine/README.md) first so `engine/dist/kestrel-engine.exe` exists; the bundle step stops if that file is missing.
+
+The portable zip is assembled separately: copy `src-tauri/target/release/aria2-app.exe` to `Kestrel Download Manager.exe` and place `engine/dist/kestrel-engine.exe` in the same folder, along with `kestrel-extension/`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, `engine/COPYING`, `engine/LICENSE.OpenSSL` and `engine/AUTHORS`.
 
 ## Configuration
 

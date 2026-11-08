@@ -38,11 +38,30 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis"],
+    "publisher": "Kestrel",
+    "homepage": "https://github.com/awm404/kestrel-download-manager",
+    "copyright": "Copyright (c) 2026 Kestrel contributors",
+    "licenseFile": "../LICENSE",
     "shortDescription": "Accessible desktop download manager for aria2",
     "longDescription": "Kestrel is a fast, keyboard- and screen-reader-friendly desktop front end for the aria2 download engine, with HTTP, BitTorrent and magnet support and a companion browser extension.",
     "resources": {
-      "../kestrel-extension/": "kestrel-extension/"
+      "../kestrel-extension/": "kestrel-extension/",
+      "../engine/dist/kestrel-engine.exe": "kestrel-engine.exe",
+      "../LICENSE": "LICENSE.txt",
+      "../THIRD_PARTY_NOTICES.md": "THIRD_PARTY_NOTICES.md",
+      "../engine/COPYING": "engine-COPYING.txt",
+      "../engine/LICENSE.OpenSSL": "engine-LICENSE.OpenSSL.txt",
+      "../engine/AUTHORS": "aria2-AUTHORS.txt"
+    },
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "nsis/header.bmp",
+        "sidebarImage": "nsis/sidebar.bmp",
+        "installMode": "currentUser"
+      }
     },
     "icon": [
       "icons/32x32.png",
