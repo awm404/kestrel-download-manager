@@ -1,0 +1,196 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index cb6e3b7..77579dc 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,3 +1,5 @@
++# Modified 2026-11-07 by Kestrel contributors for Kestrel Engine:
++# adds kestrel_engine.h to SRCS.
+ SUBDIRS = includes
+ bin_PROGRAMS = aria2c
+ aria2c_SOURCES = main.cc
+@@ -263,6 +265,7 @@ SRCS =  \
+ 	ValueBaseStructParserStateImpl.cc ValueBaseStructParserStateImpl.h\
+ 	ValueBaseStructParserStateMachine.cc ValueBaseStructParserStateMachine.h\
+ 	version_usage.cc\
++	kestrel_engine.h\
+ 	wallclock.cc wallclock.h\
+ 	WatchProcessCommand.cc WatchProcessCommand.h\
+ 	WrDiskCache.cc WrDiskCache.h\
+diff --git a/src/OptionHandlerFactory.cc b/src/OptionHandlerFactory.cc
+index 2cd2c43..6d20366 100644
+--- a/src/OptionHandlerFactory.cc
++++ b/src/OptionHandlerFactory.cc
+@@ -4,6 +4,9 @@
+  *
+  * Copyright (C) 2006 Tatsuhiro Tsujikawa
+  *
++ * Modified 2026-11-07 by Kestrel contributors for Kestrel Engine:
++ * max-connection-per-server accepts up to 64 instead of 16.
++ *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+@@ -440,7 +443,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+   {
+     OptionHandler* op(new NumberOptionHandler(PREF_MAX_CONNECTION_PER_SERVER,
+                                               TEXT_MAX_CONNECTION_PER_SERVER,
+-                                              "1", 1, 16, 'x'));
++                                              "1", 1, 64, 'x'));
+     op->addTag(TAG_BASIC);
+     op->addTag(TAG_FTP);
+     op->addTag(TAG_HTTP);
+diff --git a/src/RpcMethodImpl.cc b/src/RpcMethodImpl.cc
+index c224920..891f22b 100644
+--- a/src/RpcMethodImpl.cc
++++ b/src/RpcMethodImpl.cc
+@@ -4,6 +4,9 @@
+  *
+  * Copyright (C) 2009 Tatsuhiro Tsujikawa
+  *
++ * Modified 2026-11-07 by Kestrel contributors for Kestrel Engine:
++ * aria2.getVersion also reports the engine name and version.
++ *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+@@ -69,6 +72,7 @@
+ #include "MessageDigest.h"
+ #include "message_digest_helper.h"
+ #include "OpenedFileCounter.h"
++#include "kestrel_engine.h"
+ #ifdef ENABLE_BITTORRENT
+ #  include "bittorrent_helper.h"
+ #  include "BtRegistry.h"
+@@ -1159,6 +1163,8 @@ std::unique_ptr<ValueBase> GetVersionRpcMethod::process(const RpcRequest& req,
+ {
+   auto result = Dict::g();
+   result->put(KEY_VERSION, PACKAGE_VERSION);
++  result->put("engine", KESTREL_ENGINE_NAME);
++  result->put("engineVersion", KESTREL_ENGINE_VERSION);
+   auto featureList = List::g();
+   for (int feat = 0; feat < MAX_FEATURE; ++feat) {
+     const char* name = strSupportedFeature(feat);
+diff --git a/src/kestrel_engine.h b/src/kestrel_engine.h
+new file mode 100644
+index 0000000..6a22f0c
+--- /dev/null
++++ b/src/kestrel_engine.h
+@@ -0,0 +1,47 @@
++/* <!-- copyright */
++/*
++ * Kestrel Engine, a modified version of aria2.
++ *
++ * Copyright (C) 2026 Kestrel contributors
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ *
++ * In addition, as a special exception, the copyright holders give
++ * permission to link the code of portions of this program with the
++ * OpenSSL library under certain conditions as described in each
++ * individual source file, and distribute linked combinations
++ * including the two.
++ * You must obey the GNU General Public License in all respects
++ * for all of the code used other than OpenSSL.  If you modify
++ * file(s) with this exception, you may extend this exception to your
++ * version of the file(s), but you are not obligated to do so.  If you
++ * do not wish to do so, delete this exception statement from your
++ * version.  If you delete this exception statement from all source
++ * files in the program, then also delete it here.
++ */
++/* copyright --> */
++#ifndef D_KESTREL_ENGINE_H
++#define D_KESTREL_ENGINE_H
++
++// PACKAGE_VERSION stays the upstream aria2 version so the User-Agent,
++// BitTorrent peer ID and RPC "version" field remain what servers,
++// trackers and RPC clients expect.
++#define KESTREL_ENGINE_NAME "Kestrel Engine"
++#define KESTREL_ENGINE_VERSION PACKAGE_VERSION "-k1"
++#define KESTREL_ENGINE_BINARY "kestrel-engine"
++#define KESTREL_ENGINE_URL "https://github.com/awm404/kestrel-download-manager"
++#define KESTREL_ENGINE_BUGREPORT KESTREL_ENGINE_URL "/issues"
++
++#endif // D_KESTREL_ENGINE_H
+diff --git a/src/version_usage.cc b/src/version_usage.cc
+index d2218b4..132e7f0 100644
+--- a/src/version_usage.cc
++++ b/src/version_usage.cc
+@@ -4,6 +4,9 @@
+  *
+  * Copyright (C) 2006 Tatsuhiro Tsujikawa
+  *
++ * Modified 2026-11-07 by Kestrel contributors for Kestrel Engine:
++ * version and usage output name the fork and its upstream.
++ *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+@@ -47,15 +50,20 @@
+ #include "OptionParser.h"
+ #include "OptionHandler.h"
+ #include "util.h"
++#include "kestrel_engine.h"
+ 
+ namespace aria2 {
+ 
+ void showVersion()
+ {
+   std::cout
+-      << PACKAGE << _(" version ") << PACKAGE_VERSION << "\n"
++      << KESTREL_ENGINE_NAME << _(" version ") << KESTREL_ENGINE_VERSION << "\n"
++      << "A modified version of " << PACKAGE << " " << PACKAGE_VERSION << " ("
++      << PACKAGE_URL << ")\n"
+       << "Copyright (C) 2006, 2019 Tatsuhiro Tsujikawa"
+       << "\n"
++      << "Modifications Copyright (C) 2026 Kestrel contributors"
++      << "\n"
+       << "\n"
+       << _("This program is free software; you can redistribute it and/or "
+            "modify\n"
+@@ -77,19 +85,19 @@ void showVersion()
+       << _("Compiler") << ": " << usedCompilerAndPlatform() << "\n"
+       << _("System") << ": " << getOperatingSystemInfo() << "\n"
+       << "\n"
+-      << fmt(_("Report bugs to %s"), PACKAGE_BUGREPORT) << "\n"
+-      << _("Visit") << " " << PACKAGE_URL << std::endl;
++      << fmt(_("Report bugs to %s"), KESTREL_ENGINE_BUGREPORT) << "\n"
++      << _("Visit") << " " << KESTREL_ENGINE_URL << std::endl;
+ }
+ 
+ void showUsage(const std::string& keyword,
+                const std::shared_ptr<OptionParser>& oparser, const Console& out)
+ {
+-  out->printf(_("Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE |"
+-                " METALINK_FILE]..."));
++  out->printf(_("Usage: " KESTREL_ENGINE_BINARY
++                " [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."));
+   out->printf("\n");
+   if (keyword.empty()) {
+     // Very short version of usage.
+-    out->printf(_("See 'aria2c -h'."));
++    out->printf(_("See '" KESTREL_ENGINE_BINARY " -h'."));
+     out->printf("\n");
+     return;
+   }
+@@ -103,7 +111,8 @@ void showUsage(const std::string& keyword,
+     else {
+       out->printf(_("Printing options tagged with '%s'."), keyword.c_str());
+       out->printf("\n");
+-      out->printf(_("See 'aria2c -h#help' to know all available tags."));
++      out->printf(
++          _("See '" KESTREL_ENGINE_BINARY " -h#help' to know all available tags."));
+     }
+     out->printf("\n");
+     out->printf(_("Options:"));

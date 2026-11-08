@@ -1,0 +1,71 @@
+name: Accessibility issue
+description: Something is hard or impossible to use with a keyboard, screen reader, zoom, high contrast or other assistive technology.
+labels: ["accessibility", "bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping make Kestrel usable for everyone. Accessibility problems are treated as bugs.
+        You do not need to know WCAG terminology; a plain description of what you tried and what happened is perfect.
+        If you prefer not to use GitHub, see the contact address in [ACCESSIBILITY.md](../blob/main/ACCESSIBILITY.md#feedback).
+  - type: textarea
+    id: barrier
+    attributes:
+      label: What were you trying to do, and what got in the way?
+      placeholder: "I tried to rename a finished download using only the keyboard, but after closing the dialog focus jumped to the top of the window."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Press Tab until ...
+        2. Press Enter ...
+        3. The screen reader says ...
+    validations:
+      required: true
+  - type: checkboxes
+    id: input
+    attributes:
+      label: How do you use Kestrel?
+      description: Select all that apply.
+      options:
+        - label: Keyboard only
+        - label: Screen reader
+        - label: Screen magnifier or browser zoom
+        - label: Windows High Contrast / contrast themes
+        - label: Reduced motion
+        - label: Voice control or switch access
+        - label: Mouse or touch
+  - type: input
+    id: at
+    attributes:
+      label: Assistive technology and version
+      placeholder: "NVDA 2024.4, JAWS 2025, Narrator, Windows Magnifier at 300%, Dragon ..."
+  - type: dropdown
+    id: component
+    attributes:
+      label: Where does it happen?
+      options:
+        - Desktop app
+        - Browser extension popup
+        - Documentation
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Kestrel and Windows version
+      placeholder: "Kestrel 1.0.0 on Windows 11 24H2"
+    validations:
+      required: true
+  - type: input
+    id: wcag
+    attributes:
+      label: WCAG success criterion (optional)
+      placeholder: "2.4.3 Focus Order"
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What would work better for you? (optional)

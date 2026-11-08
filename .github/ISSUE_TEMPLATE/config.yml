@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/awm404/kestrel-download-manager/security/advisories/new
+    about: Please report vulnerabilities privately, not as a public issue.
+  - name: aria2 engine problems
+    url: https://github.com/aria2/aria2/issues
+    about: Problems in aria2 itself (protocol support, download engine crashes) belong to the aria2 project.

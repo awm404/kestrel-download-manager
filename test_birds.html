@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background: #0a0d14; color: white; font-family: sans-serif; display: flex; gap: 24px; padding: 40px; }
+  .box { background: #161c2b; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  svg { width: 120px; height: 120px; }
+</style>
+</head>
+<body>
+  <!-- Design A: Sleek aerodynamic soaring kestrel falcon -->
+  <div class='box'>
+    <h3>Design A (Soaring Falcon)</h3>
+    <svg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <defs>
+        <linearGradient id='gradA' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='#06b6d4'/>
+          <stop offset='100%' stop-color='#6366f1'/>
+        </linearGradient>
+      </defs>
+      <!-- Falcon body, sharp beak, swept back wings, tail -->
+      <path d='M82 34 C76 30, 68 28, 60 29 C52 30, 44 26, 36 18 C34 16, 30 18, 32 21 C36 28, 42 34, 46 38 C34 40, 22 36, 14 30 C12 28, 10 31, 12 33 C18 41, 28 47, 40 48 C28 52, 18 50, 12 46 C10 45, 9 48, 11 50 C19 58, 30 62, 44 59 L35 78 C34 81, 38 82, 40 79 L52 63 C56 61, 62 58, 68 52 C74 46, 88 42, 89 40 C92 38, 90 35, 87 35 C85 35, 83 34, 82 34 Z' fill='url(#gradA)'/>
+      <circle cx='70' cy='36' r='2' fill='#ffffff'/>
+    </svg>
+  </div>
+
+  <!-- Design B: Modern geometric / origami kestrel in rapid dive -->
+  <div class='box'>
+    <h3>Design B (Origami High-Speed Dive)</h3>
+    <svg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <defs>
+        <linearGradient id='gradB1' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='#38bdf8'/>
+          <stop offset='100%' stop-color='#06b6d4'/>
+        </linearGradient>
+        <linearGradient id='gradB2' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='#06b6d4'/>
+          <stop offset='100%' stop-color='#6366f1'/>
+        </linearGradient>
+        <linearGradient id='gradB3' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='#6366f1'/>
+          <stop offset='100%' stop-color='#4338ca'/>
+        </linearGradient>
+      </defs>
+      <!-- Head & Beak -->
+      <polygon points='55,18 78,32 68,36 55,28' fill='url(#gradB1)'/>
+      <!-- Beak tip hooked -->
+      <polygon points='78,32 86,36 78,38 74,35' fill='#38bdf8'/>
+      <!-- Main Upper Wing -->
+      <polygon points='55,28 32,8 44,38 58,42' fill='url(#gradB1)'/>
+      <polygon points='44,38 18,22 34,48 50,50' fill='url(#gradB2)'/>
+      <!-- Secondary Wing -->
+      <polygon points='34,48 12,38 28,60 48,58' fill='url(#gradB2)'/>
+      <!-- Torso & Aerodynamic Chest -->
+      <polygon points='68,36 78,38 68,54 55,48' fill='url(#gradB2)'/>
+      <!-- Tail / Stabilizers -->
+      <polygon points='48,58 38,82 48,74 58,58' fill='url(#gradB3)'/>
+      <polygon points='58,58 56,86 64,68 66,54' fill='url(#gradB3)'/>
+      <!-- Falcon Eye -->
+      <circle cx='66' cy='31' r='2.2' fill='#ffffff'/>
+    </svg>
+  </div>
+
+  <!-- Design C: Iconic Falcon Head & Swept Wing Badge -->
+  <div class='box'>
+    <h3>Design C (Falcon Profile Mark)</h3>
+    <svg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <defs>
+        <linearGradient id='gradC' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='#06b6d4'/>
+          <stop offset='100%' stop-color='#6366f1'/>
+        </linearGradient>
+      </defs>
+      <path d='M75,32 C70,24 60,18 48,18 C38,18 28,24 22,32 C18,37 16,44 16,50 C16,68 30,82 50,82 C68,82 82,68 82,50 C82,45 80,38 75,32 Z' fill='#10141f' stroke='url(#gradC)' stroke-width='3'/>
+      <!-- Falcon silhouette inside -->
+      <path d='M68,34 C64,30 57,28 50,29 C45,30 38,27 33,22 C31,20 28,21 30,24 C33,29 38,34 42,37 C32,38 24,35 18,31 C16,29 14,31 16,33 C21,39 28,44 38,45 C28,47 20,46 16,43 C14,42 13,44 15,46 C21,52 30,56 42,54 L36,70 C35,72 38,73 40,71 L50,58 C53,56 58,54 62,49 C67,44 76,41 77,39 C79,37 77,35 75,35 C73,35 70,34 68,34 Z' fill='url(#gradC)' transform='translate(5,2) scale(0.9)'/>
+    </svg>
+  </div>
+</body>
+</html>

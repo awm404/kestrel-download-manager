@@ -1,0 +1,74 @@
+name: Bug report
+description: Something in Kestrel or the browser extension does not work as expected.
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. **Security vulnerabilities must not be reported here.** Please follow [SECURITY.md](../blob/main/SECURITY.md) instead.
+        If the problem is about using Kestrel with a keyboard, screen reader, zoom or other assistive technology, the **Accessibility issue** template is a better fit.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem, and what you expected to happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add the URL ...
+        2. Select Pause ...
+        3. See error ...
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Where does it happen?
+      options:
+        - Desktop app
+        - Browser extension
+        - Both
+        - Installer / build
+    validations:
+      required: true
+  - type: input
+    id: kestrel-version
+    attributes:
+      label: Kestrel version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: aria2-version
+    attributes:
+      label: aria2 version
+      description: Output of the first line of `aria2c --version`.
+      placeholder: "aria2 version 1.37.0"
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version (extension bugs only)
+      placeholder: "Edge 131"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log output
+      description: |
+        Relevant lines from `%USERPROFILE%\.aria2\tauri_app.log`. **Remove URLs, cookies and RPC secrets before pasting.**
+      render: text
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or recordings
+      description: Optional. Drag images or videos here.

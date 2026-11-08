@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kestrel Companion</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent-cyan: #38bdf8;
+      --status-success: #10b981;
+      --status-danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      width: 330px;
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      user-select: none;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-img {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+    }
+    .title-box {
+      display: flex;
+      flex-direction: column;
+    }
+    .app-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #fff;
+    }
+    .sub-name {
+      font-size: 10.5px;
+      color: var(--accent-cyan);
+      font-weight: 500;
+    }
+    .engine-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--status-danger);
+    }
+    .status-dot.online {
+      background: var(--status-success);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .toggle-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .toggle-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    
+    /* Switch: the real checkbox covers the track so it stays focusable and clickable. */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 0 1px #64748b;
+      transition: .2s;
+      border-radius: 20px;
+    }
+    .switch input:focus-visible + .slider {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 2px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--accent-cyan);
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    .form-group {
+      margin-top: 10px;
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input {
+      width: 100%;
+      min-height: 30px;
+      padding: 7px 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #64748b;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+    }
+    .form-input::placeholder { color: var(--muted); opacity: 1; }
+    .form-input:focus-visible {
+      border-color: var(--accent-cyan);
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 1px;
+    }
+    .btn:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    .engine-status.online #engineText { color: var(--status-success); }
+    .engine-status.offline #engineText { color: #f87171; }
+    .status-dot.offline { border-radius: 1px; }
+    .send-status {
+      font-size: 11px;
+      margin-top: 8px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+    .send-status:empty { display: none; }
+    .send-status.ok { color: var(--status-success); }
+    .send-status.error { color: #f87171; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slider, .slider:before { transition: none; }
+    }
+    @media (forced-colors: active) {
+      .slider { border: 1px solid CanvasText; }
+      .slider:before { background-color: CanvasText; }
+      input:checked + .slider { background-color: Highlight; }
+      .status-dot { forced-color-adjust: none; }
+    }
+
+    .quick-box {
+      display: flex;
+      gap: 6px;
+    }
+    .btn {
+      min-height: 30px;
+      padding: 7px 12px;
+      background: var(--accent-cyan);
+      color: #030712;
+      border: none;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    .hint-box {
+      font-size: 10.5px;
+      color: var(--muted);
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <img src="icons/icon-32.png" alt="" class="logo-img">
+      <div class="title-box">
+        <h1 class="app-name">Kestrel Companion</h1>
+        <span class="sub-name">Browser Download Bridge</span>
+      </div>
+    </div>
+    <div class="engine-status" id="engineStatusBadge" role="status" title="Engine: Checking connection...">
+      <span class="status-dot" id="engineDot" aria-hidden="true"></span>
+      <span class="sr-only">Kestrel engine </span><span id="engineText">Checking...</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <label class="toggle-label" id="autoInterceptLabel" for="autoInterceptToggle">Auto-Intercept Downloads</label>
+          <div class="toggle-desc" id="autoInterceptDesc">Captures cookies &amp; sends matched files to Kestrel</div>
+        </div>
+        <div class="switch">
+          <input type="checkbox" role="switch" id="autoInterceptToggle" aria-describedby="autoInterceptDesc" checked>
+          <span class="slider" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 12px;">
+        <label class="form-label" for="extensionsInput">Target File Formats (Non-Intrusive)</label>
+        <input type="text" class="form-input" id="extensionsInput" aria-describedby="extensionsHint" placeholder="mkv, mp4, zip, rar, iso, exe" spellcheck="false">
+        <p class="sr-only" id="extensionsHint">Comma-separated list of file extensions. Saved when you leave the field.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="rpcSecretInput">RPC Secret</label>
+        <input type="password" class="form-input" id="rpcSecretInput" aria-describedby="rpcSecretHint" autocomplete="off" spellcheck="false">
+        <p class="toggle-desc" id="rpcSecretHint">Filled in automatically while Kestrel is running. To set it by hand, open Preferences, expand <strong>Advanced Engine Connection</strong>, and copy RPC Secret Token.</p>
+      </div>
+
+      <div class="hint-box">
+        <span aria-hidden="true">💡</span>
+        <span>Tip: Turn off Auto-Intercept to let your browser handle every download itself.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+      <form id="sendForm" novalidate>
+        <label class="form-label" for="manualUrlInput">Send URL to Kestrel</label>
+        <div class="quick-box">
+          <input type="url" class="form-input" id="manualUrlInput" placeholder="Paste any download link" aria-describedby="sendStatus" spellcheck="false" autocomplete="off">
+          <button type="submit" class="btn" id="sendBtn">Send</button>
+        </div>
+        <p class="send-status" id="sendStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
