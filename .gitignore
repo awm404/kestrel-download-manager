@@ -32,3 +32,14 @@ dist-portable
 # Kestrel Engine build output and scratch source tree
 engine/work
 engine/dist
+
+# Local design scratch
+bird_isolated.png
+squircle_icon.png
+test_32.png
+test_32_sharp.png
+test_birds.html
+test_icon.ico
+test_toast.ps1
+verify_final_syntax.js
+verify_syntax.js
