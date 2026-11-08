@@ -21,6 +21,7 @@ Kestrel wraps aria2's fast multi-connection, BitTorrent and magnet engine in a s
 ## Contents
 
 - [Features](#features)
+- [Kestrel and aria2](#kestrel-and-aria2)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Building from source](#building-from-source)
@@ -45,6 +46,42 @@ Kestrel wraps aria2's fast multi-connection, BitTorrent and magnet engine in a s
 - **System tray** with pause all, resume all, an optional close-to-tray mode, and native completion notifications.
 - **Browser companion extension** for Chromium browsers that hands matching downloads to Kestrel together with your session cookies.
 - **Accessibility built in:** full keyboard operation, screen-reader names and live announcements, visible focus, text zoom up to 200%, reflow down to 320 CSS px, reduced-motion support and Windows High Contrast (forced colours) support. See [ACCESSIBILITY.md](ACCESSIBILITY.md).
+
+## Kestrel and aria2
+
+Every transfer is performed by [aria2](https://aria2.github.io/), or by [Kestrel Engine](engine/README.md), which is aria2 1.37.0 with the small changes in the second table. Kestrel is the window around that engine. Download speed, resume, and the protocol behaviour come from aria2.
+
+| | Kestrel Download Manager | aria2 1.37.0 |
+| --- | --- | --- |
+| How you use it | A desktop window, a system tray, and the keyboard or a screen reader | `aria2c` on the command line, or JSON-RPC from another program |
+| What moves the bytes | Kestrel Engine, or `aria2c` when that is the engine Kestrel finds | `aria2c` |
+| Protocols | HTTP(S), FTP, magnet links, and BitTorrent | The same, and Metalink |
+| Connections per server | Up to 64 with Kestrel Engine, and up to 16 with stock aria2 | Up to 16 |
+| Resume | Yes, through the engine | Yes |
+| Adding a download | Paste a URL, several URLs, a magnet link, or a `curl` command copied from the browser | Command-line arguments, an input file, or RPC |
+| Signed-in downloads | The browser companion sends the cookies for that site | You pass cookies yourself, with `--header` or an input file |
+| Stale or HTML error pages | The transfer is flagged, and Kestrel can try to resolve the real mirror link | You notice it from the log or the saved file |
+| Progress | Transfer cards, a bandwidth chart, and a piece map | Log lines, or RPC if you build a client |
+| Accessibility | Aimed at [WCAG 2.2 AA](ACCESSIBILITY.md) | The terminal |
+| Platforms | Windows 10 and 11. macOS and Linux builds are untested | Windows, macOS, Linux, and others |
+| Configuration | Preferences for the folder, connections per server, and seeding. Any other option still applies when it is set in `aria2.conf` | `aria2.conf` and command-line options |
+| Licence | The app is [MIT](LICENSE). The bundled engine is [GPL-2.0-or-later](engine/COPYING) | GPL-2.0-or-later |
+
+Opening many connections to one server can be treated as abuse. Some hosts throttle or ban clients that do it. The higher cap is a ceiling, and the value you save in Preferences is what the engine uses.
+
+### What Kestrel Engine changes
+
+| | Kestrel Engine 1.37.0-k1 | aria2 1.37.0 |
+| --- | --- | --- |
+| `--max-connection-per-server` | Up to 64 | Up to 16 |
+| Version banner | Names Kestrel Engine and credits aria2 as the upstream | Names aria2 |
+| `aria2.getVersion` | Also returns `engine` and `engineVersion`. The `version` field is still the aria2 version | Returns the aria2 version |
+| Windows libraries | Newer zlib, Expat, SQLite, c-ares, and libssh2 | The versions shipped with official aria2 1.37.0 |
+| User-Agent | `aria2/1.37.0` | `aria2/1.37.0` |
+| BitTorrent peer ID | `A2-1-37-0-` | `A2-1-37-0-` |
+| Other options and defaults | Unchanged | Unchanged |
+
+The User-Agent and peer ID stay aria2's so servers and private trackers keep recognising the client. The patch, the library versions, and the licence are in [engine/README.md](engine/README.md).
 
 ## Requirements
 

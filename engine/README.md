@@ -9,7 +9,7 @@ Kestrel Engine is the download engine bundled with Kestrel Download Manager. It 
 
 ## Changes from aria2 1.37.0
 
-All changes are in [`patches/0001-kestrel-engine.patch`](patches/0001-kestrel-engine.patch), and each modified file carries a dated notice.
+A side-by-side comparison of the app and of this engine is in the [project README](../README.md#kestrel-and-aria2). All engine changes are in [`patches/0001-kestrel-engine.patch`](patches/0001-kestrel-engine.patch), and each modified file carries a dated notice.
 
 | Change | Files |
 | --- | --- |

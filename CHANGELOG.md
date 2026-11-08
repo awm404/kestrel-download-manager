@@ -19,6 +19,7 @@ First public release of Kestrel Download Manager for Windows.
 - `THIRD_PARTY_NOTICES.md` for aria2, the libraries in the engine build, the Rust dependencies, icons and fonts.
 - Browser companion extension for Chromium. It reads the RPC secret from Kestrel automatically while the app is running.
 - A current-user Windows installer with Kestrel artwork. It installs Kestrel Engine, the licence notices and the browser extension beside the app. The portable zip remains available alongside it.
+- A README comparison of Kestrel Download Manager and Kestrel Engine with aria2 1.37.0.
 - **Folder** opens the directory that contains the download. A torrent is labelled Seeding only while it is actively seeding, and Stop Seed reports a failure if the engine rejects the pause.
 
 ### Fixed
